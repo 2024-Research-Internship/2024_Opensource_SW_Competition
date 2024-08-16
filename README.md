@@ -4,6 +4,9 @@
 
 # Opensource Search Engine
 
+## Demo
+![Streamlit_demo](./figure/streamlit_demo.png)
+
 ## Motivation
 사용자들이 잘 알지 못하는 분야의 오픈소스를 찾기 어렵다는 점을 반영하여, Chatbot 상호작용 기반의 검색 및 추천 시스템을 개발하였습니다.
 

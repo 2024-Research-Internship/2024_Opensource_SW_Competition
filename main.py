@@ -1,7 +1,6 @@
 import streamlit as st
 import os
 
-
 from retrieve import retrieve_from_github
 from rerank import rerank_by_readme
 from chat_interaction import get_intent_from_chatgpt
@@ -9,10 +8,6 @@ from chat_interaction import get_intent_from_chatgpt
 # OpenAI API 키 설정
 os.environ['OPENAI_API_KEY']=None
 
-
-
-import streamlit as st
-from PIL import Image
 
 def main():
     # Set the title and layout of the app
