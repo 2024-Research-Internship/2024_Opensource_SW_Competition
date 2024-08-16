@@ -1,12 +1,14 @@
 import streamlit as st
 import os
+from dotenv import load_dotenv
 
 from retrieve import retrieve_from_github
 from rerank import rerank_by_readme
 from chat_interaction import get_intent_from_chatgpt
 
 # OpenAI API 키 설정
-os.environ['OPENAI_API_KEY']=None
+load_dotenv()
+os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
 
 
 def main():
@@ -38,7 +40,7 @@ def main():
 
                 st.info("🔧 **Reranking repositories according to your preferences...**")
                 # 3. Analyze and rerank repositories by README content
-                ranked_results = rerank_by_readme(search_results)
+                ranked_results = rerank_by_readme(intent, search_results)
                 st.write("### 🏆 Top 5 Recommended Repositories")
                 for i, repo in enumerate(ranked_results[:5], 1):
                     st.markdown(f"**{i}. [{repo['full_name']}]({repo['html_url']})**")
@@ -46,12 +48,16 @@ def main():
                     st.write(f"   - ⭐ **Stars:** {repo['stargazers_count']}")
                     st.write(f"   - 🍴 **Forks:** {repo['forks_count']}")
                     st.write(f"   - 📅 **Last Updated:** {repo['updated_at']}")
+                    readme_preview = repo['readme'][:300] if 'readme' in repo else "README not available."
+                    st.markdown(f"   - 📖 **README Preview:**\n\n```markdown\n{readme_preview}\n```")
+                    st.markdown(f"[🔗 Read the full README on GitHub]({repo['html_url']}/blob/main/README.md)")
+                    st.markdown("---")
+                    
         else:
             st.warning('⚠️ Please enter a query to get recommendations.')
 
     # Add a footer
     st.markdown("""
-                ---
                 **Note:** This tool is powered by OpenAI's ChatGPT and GitHub APIs. The results are based on the most recent data available.
                 """)
 

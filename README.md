@@ -1,7 +1,6 @@
 
 # 2024 오픈소스 개발자 대회
 2024 오픈소스 개발자 대회 소스 코드입니다.
-
 # Opensource Search Engine
 
 ## Demo
@@ -11,6 +10,10 @@
 사용자들이 잘 알지 못하는 분야의 오픈소스를 찾기 어렵다는 점을 반영하여, Chatbot 상호작용 기반의 검색 및 추천 시스템을 개발하였습니다.
 
 ## How To Use
+.env 파일을 생성한 뒤 다음 내용을 입력하세요.
+```sh
+OPENAI_API_KEY="Your_API_Key"
+```
 다음 명령어를 통해 웹 인터페이스에서 서비스를 이용할 수 있습니다:
 ```
 streamlit run main.py

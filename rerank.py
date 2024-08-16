@@ -1,31 +1,33 @@
-import streamlit as st
-import requests
-import json
-from bs4 import BeautifulSoup
 from typing import List, Tuple
-from openai import OpenAI
 import os
+from sentence_transformers import CrossEncoder
 
-def readme_score(readme_content: str) -> int:
-        # 간단한 분석 예: README의 단어 수를 사용한 점수 매기기
-    return len(readme_content.split())
+
+model = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+def readme_score(query: str, readme_content: str) -> int:
+    # Crossencoder 모델을 사용한 query <-> readme score 계산
+    
+    inputs = [(query, readme_content)]
+    scores = model.predict(inputs)
+    
+    print(query, scores)
+    
+    return scores[0]
     
     
     
-# README 파일 분석 및 재순위
-def rerank_by_readme(repositories: List[dict]) -> List[dict]:
+# README 파일 분석 및 재순위화
+def rerank_by_readme(query:str, repositories: List[dict]) -> List[dict]:
 
     scored_repos = []
     for repo in repositories:
-        readme_url = repo['contents_url'].replace('{+path}', 'README.md')
-        try:
-            readme_response = requests.get(readme_url)
-            readme_content = readme_response.text
-            score = readme_score(readme_content)
-            scored_repos.append((repo, score))
-        except Exception as e:
-            st.write(f"Error fetching README for {repo['full_name']}: {e}")
+        score = readme_score(query, repo['readme'])
+        scored_repos.append((repo, score))
     
     # 점수를 기준으로 리포지토리 정렬
     scored_repos.sort(key=lambda x: x[1], reverse=True)
+    
+    #debugging
+    print([(repo['full_name'],score) for repo, score in scored_repos])
+    
     return [repo for repo, score in scored_repos]
