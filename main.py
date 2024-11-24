@@ -25,22 +25,22 @@ def main():
 
     # Get user input
     st.write("### 🔍 Search for Repositories")
-    user_query = st.text_input('Enter your query:', placeholder="e.g., machine learning, data visualization")
+    user_query = st.text_input('Enter your query for our AI:', placeholder="e.g., I want to find machine learning projects")
 
     if st.button('Get Recommendations'):
         if user_query:
             with st.spinner('Analyzing your query and fetching the best repositories...'):
                 # 1. Identify user intent using ChatGPT API
                 intent = get_intent_from_chatgpt(user_query)
-                st.success(f'🎯 Intent identified: **{intent}**')
+                st.success(f'🎯 Intent identified.\n**Search Keywords:** {intent["search_keywords"]}\n**Re-rank Keywords:** {intent["rerank_keywords"]}')
 
                 # 2. Fetch GitHub search results
-                search_results = retrieve_from_github(user_query)
+                search_results = retrieve_from_github(intent['search_keywords'])
                 st.success(f'🔎 Found **{len(search_results)}** repositories related to your query.')
 
                 st.info("🔧 **Reranking repositories according to your preferences...**")
                 # 3. Analyze and rerank repositories by README content
-                ranked_results = rerank_by_readme(intent, search_results)
+                ranked_results = rerank_by_readme(intent['rerank_keywords'], search_results)
                 st.write("### 🏆 Top 5 Recommended Repositories")
                 for i, repo in enumerate(ranked_results[:5], 1):
                     st.markdown(f"**{i}. [{repo['full_name']}]({repo['html_url']})**")

@@ -1,5 +1,7 @@
 import requests
 from typing import List, Tuple
+#from dotenv import load_dotenv
+#import os
 
 # GitHub API 설정
 GITHUB_API_URL = 'https://api.github.com/search/repositories'
@@ -7,9 +9,8 @@ GITHUB_API_URL = 'https://api.github.com/search/repositories'
 
 # GitHub에서 리포지토리 검색
 def retrieve_from_github(query: str) -> List[dict]:
-
     # Step 1. Get Repository URL from github
-    response = requests.get(GITHUB_API_URL, params={'q': query, 'per_page': 10}) #should be change to 100
+    response = requests.get(GITHUB_API_URL, params={'q': query, 'per_page': 10}) #can change to 100
     response.raise_for_status()
     repositories = response.json().get('items', [])
 
