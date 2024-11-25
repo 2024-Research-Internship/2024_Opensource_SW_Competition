@@ -34,8 +34,8 @@ def main():
     with st.sidebar:
         st.header("💬 Conversation History")
         conversation_container = st.empty()  # 대화 내역 컨테이너
-        conversation_text = "\n".join(st.session_state.conversation_history)
-        conversation_container.text(conversation_text)  # 대화 내역 표시
+        conversation_text = "\n".join([f"**{'User: '+m[6:] if m.startswith('User:') else 'Chat: ' + m[9:]}**\n" for m in st.session_state.conversation_history])
+        conversation_container.markdown(conversation_text, unsafe_allow_html=True)
 
         # 입력 필드와 버튼
         st.header("🔍 User Input")
@@ -48,19 +48,18 @@ def main():
         st.session_state.conversation_history.append(f"User: {user_query}")
 
         # 검색 의도 판단
-        stop_chat = check_continue_chatting(user_query, "\n".join(st.session_state.conversation_history))
+        stop_chat = check_continue_chatting(user_query)
         st.session_state.conversation_history.append(f"Chatbot: {stop_chat['response']}")
 
         # 대화 내역 업데이트
-        conversation_text = "\n".join(st.session_state.conversation_history)
-        conversation_container.text(conversation_text)  # 갱신된 대화 내역 표시
-
+        conversation_text = "\n".join([f"**{'User: '+m[6:] if m.startswith('User:') else 'Chat: ' + m[9:]}**\n" for m in st.session_state.conversation_history])
+        conversation_container.markdown(conversation_text, unsafe_allow_html=True)
         # 검색 의도가 있는 경우 처리
         if stop_chat['intent'] == 'yes':
             # 검색 의도를 추출
             intent = get_intent_from_chatgpt(user_query, "\n".join(st.session_state.conversation_history))
             st.success(f"🎯 Detected search intent.")
-            st.markdown(f"**Search Keywords:** {intent['search_keywords']} \
+            st.markdown(f"**Search Keywords:** {intent['search_keywords']}  \
                          **Re-rank Keywords:** {intent['rerank_keywords']}")
 
             # GitHub에서 리포지토리 검색
@@ -80,6 +79,12 @@ def main():
                     st.write(f"   - ⭐ **Stars:** {repo['stargazers_count']}")
                     st.write(f"   - 🍴 **Forks:** {repo['forks_count']}")
                     st.write(f"   - 📅 **Last Updated:** {repo['updated_at']}")
+
+                    # 추천 이유 생성
+                    keywords = intent['rerank_keywords']
+                    recommended_reason = f"This repository is recommended because its description and README content align with keywords like: **{keywords}**."
+                    st.markdown(f"   - 🤖 **Why Recommended:** {recommended_reason}")
+
                     readme_preview = repo['readme'][:300] if 'readme' in repo else "README not available."
                     st.markdown(f"   - 📖 **README Preview:**\n\n```markdown\n{readme_preview}\n```")
                     st.markdown(f"[🔗 Read the full README on GitHub]({repo['html_url']}/blob/main/README.md)")
@@ -90,8 +95,8 @@ def main():
         else:
             st.info(stop_chat['response'])
             # 갱신된 대화 내역 표시
-            conversation_text = "\n".join(st.session_state.conversation_history)
-            conversation_container.text(conversation_text)
+            conversation_text = "\n".join([f"**{'User: '+m[6:] if m.startswith('User:') else 'Chat: ' + m[9:]}**\n" for m in st.session_state.conversation_history])
+            conversation_container.markdown(conversation_text, unsafe_allow_html=True)
 
     # 페이지 하단 추가 정보
     with st.container():
