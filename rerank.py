@@ -15,7 +15,7 @@ def readme_score(query: str, readme_content: str) -> int:
     inputs = [(query, readme_content)]
     scores = model.predict(inputs)
     
-    print(query, scores)
+    #print(query, scores)
     
     return scores[0]
     

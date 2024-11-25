@@ -1,6 +1,3 @@
-
-# 2024 오픈소스 개발자 대회
-2024 오픈소스 개발자 대회 소스 코드입니다.
 # Opensource Search Engine
 
 ## Demo
@@ -45,7 +42,7 @@ streamlit run main.py
 3. Langchain & Streamlit
 
 # Training Process
-모델 학습은 다음과 같은 방법으로 진행되었습니다:
+모델 학습은 다음과 같은 방법으로 진행되었으며, "train_crossencoder.ipynb" 파일을 통해 그 과정을 체험해볼 수 있습니다.
 - Retrieve 단계는 GPT 및 GitHub API를 사용하여 구현되었습니다.
 - **Doc2Query**를 사용하여 Query와 Document(Readme) 간의 관계를 형성하여 학습에 사용하였습니다.
 - **CrossEncoder** 모델을 사용하여 Reranking 단계를 수행하였습니다.
