@@ -24,12 +24,15 @@ streamlit run main.py
 
 1. **User - Chatbot Interaction**
    - 사용자가 Chatbot과 상호작용하며, 찾고자 하는 오픈소스 프로젝트를 파악하는 단계입니다.
+   - 사용자와 대화를 진행하며, 사용자가 오픈소스 검색을 필요로 하는 경우 다음 단계로 넘어갑니다.
 
 2. **GitHub Repository Retrieve**
    - GitHub API를 통해 사용자의 입력에 따라 관련 오픈소스 프로젝트 목록을 가져오는 단계입니다.
+   - Chatbot이 사용자의 질의 및 과거 대화로부터 원하는 오픈소스가 무엇인지 파악하고, 이를 통해 키워드 기반 검색을 수행합니다.
 
 3. **Rerank Stage**
    - 검색된 결과를 사용자의 선호도에 따라 재정렬하는 단계입니다.
+   - 사용자의 질의와 검색 오픈소스(Readme)의 유사도를 CrossEncoder를 통해 재순위화를 진행합니다.
    - *(향후 추가)*: 과거 사용자의 선호도를 분석하여 순위에 반영하는 기능을 추가할 예정입니다.
 
 4. **Opensource Recommendation**
