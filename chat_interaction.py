@@ -2,24 +2,29 @@ from openai import OpenAI
 import json
 
 
-def check_continue_chatting(user_query:str, history:str=None) -> bool:
+def check_continue_chatting(user_query:str, history:str=None) -> dict:
     """
     Check if the user's query contains an intent to search and return
     the result along with an appropriate response.
     """
     client = OpenAI()
 
-    PROMPT = '''Determine if the user's query indicates an intent to search for GitHub repositories. 
-    If the query suggests searching (e.g., contains phrases like "search", "find", "recommend"), 
-    return "yes". Otherwise, return "no" and provide an appropriate conversational response to continue the chat.
+    PROMPT = PROMPT = '''Analyze the user's input and determine the following:
+    1. If the user's query indicates an intent to search for GitHub repositories and contains sufficient details to proceed, return "yes".
+    2. If sufficient details are not provided, return "no" and include a conversational response that:
+        - Appropriately responds to the user's input (e.g., if the user greets, respond with a greeting).
+        - Encourages the user to provide specific details about the repository they are looking for.
 
     Output format:
     {
         "intent": "yes" or "no",
-        "response": "<GPT-generated response>"
+        "response": "<A GPT-generated response that first acknowledges the user's input and then encourages them to provide details if needed>"
     }
 
-    Do not include any additional text or explanations outside the JSON format.'''
+    Always generate responses that feel natural and are tailored to the user's input. For example:
+    - If the user greets, respond with a greeting and then guide them to provide repository-related details.
+    - If the user asks a question unrelated to GitHub repositories, respond to the question appropriately while gently steering the conversation back to repositories.'''
+
 
     if history:
         PROMPT += ("And here is an user chatting history. Reffer it." + history)
@@ -61,7 +66,7 @@ Return the results in JSON format with the keys "search_keywords" and "rerank_ke
 Ensure the response is concise, accurate, and suitable for direct use in GitHub search and re-ranking of repositories. Do not include any additional text or explanation.'''
 
     if history:
-        PROMPT += ("And here is an user chatting history. Reffer it." + history)
+        PROMPT += ("And here is the user's chatting history. Refer to it: " + history)
         print(PROMPT)
 
     completion = client.chat.completions.create(

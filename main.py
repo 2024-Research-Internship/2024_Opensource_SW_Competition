@@ -48,7 +48,7 @@ def main():
         st.session_state.conversation_history.append(f"User: {user_query}")
 
         # 검색 의도 판단
-        stop_chat = check_continue_chatting(user_query)
+        stop_chat = check_continue_chatting(user_query, "\n".join(st.session_state.conversation_history))
         st.session_state.conversation_history.append(f"Chatbot: {stop_chat['response']}")
 
         # 대화 내역 업데이트
