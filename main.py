@@ -26,6 +26,32 @@ def main():
     Chat with AI or get tailored recommendations for GitHub repositories based on your queries.  
     """)
 
+    # 초기 화면에 리포지토리 띄우기
+    if "search_executed" not in st.session_state:
+        st.session_state.search_executed = False  
+
+    if not st.session_state.search_executed:
+        st.header("🔥 Repositories Which You May Like")
+        default_keywords = ["Information retrieval"]  # 초기 화면에 띄울 리포지토리 키워드
+
+        try:
+            popular_repos = retrieve_from_github(default_keywords)
+
+            if popular_repos:
+                for i, repo in enumerate(popular_repos[:2], 1):
+                    st.markdown(f"**{i}. [{repo['full_name']}]({repo['html_url']})**")
+                    st.write(f"   - 📝 **Description:** {repo['description']}")
+                    st.write(f"   - ⭐ **Stars:** {repo['stargazers_count']}")
+                    st.write(f"   - 🍴 **Forks:** {repo['forks_count']}")
+                    st.write(f"   - 📅 **Last Updated:** {repo['updated_at']}")
+                    readme_preview = repo['readme'][:300] if 'readme' in repo else "README not available."
+                    st.markdown(f"   - 📖 **README Preview:**\n\n```markdown\n{readme_preview}\n```")
+                    st.markdown("---")
+            else:
+                st.warning("Not found.")
+        except Exception as e:
+            st.error(f"Error: {e}")
+
     # 대화 내역 초기화
     if "conversation_history" not in st.session_state:
         st.session_state.conversation_history = []  # 메시지를 리스트로 저장
@@ -44,11 +70,12 @@ def main():
 
     # 사용자가 입력하고 제출 버튼을 눌렀을 때
     if submit_button and user_query:
+        st.session_state.search_executed = True
         # 사용자 입력 추가
         st.session_state.conversation_history.append(f"User: {user_query}")
 
         # 검색 의도 판단
-        stop_chat = check_continue_chatting(user_query, "\n".join(st.session_state.conversation_history))
+        stop_chat = check_continue_chatting(user_query)
         st.session_state.conversation_history.append(f"Chatbot: {stop_chat['response']}")
 
         # 대화 내역 업데이트

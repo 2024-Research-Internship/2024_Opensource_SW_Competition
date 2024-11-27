@@ -9,21 +9,27 @@ def check_continue_chatting(user_query:str, history:str=None) -> dict:
     """
     client = OpenAI()
 
-    PROMPT = PROMPT = '''Analyze the user's input and determine the following:
-    1. If the user's query indicates an intent to search for GitHub repositories and contains sufficient details to proceed, return "yes".
-    2. If sufficient details are not provided, return "no" and include a conversational response that:
-        - Appropriately responds to the user's input (e.g., if the user greets, respond with a greeting).
-        - Encourages the user to provide specific details about the repository they are looking for.
+    PROMPT = '''
+    Analyze the user's input and determine the following:
+    1. If the user's query clearly indicates an intent to search for GitHub repositories (e.g., contains words like "find," "search," "recommend," or similar phrases) and provides sufficient details to proceed, return "yes".
+    2. If the user's query indicates an intent to search but lacks sufficient details, return "yes" (to proceed with the search) and also include a response that:
+        - Acknowledges the user's intent to search.
+        - States that a search will be performed based on the current information but encourages the user to provide more details to improve accuracy.
+
+    3. If the user's query does not indicate an intent to search, return "no" and provide a conversational response that:
+        - Appropriately acknowledges the user's input (e.g., if the user greets, respond with a greeting).
+        - Gently steers the conversation toward providing details about the repositories they are looking for.
 
     Output format:
     {
         "intent": "yes" or "no",
-        "response": "<A GPT-generated response that first acknowledges the user's input and then encourages them to provide details if needed>"
+        "response": "<A GPT-generated response that acknowledges the user's input and explains the action to be taken>"
     }
 
-    Always generate responses that feel natural and are tailored to the user's input. For example:
-    - If the user greets, respond with a greeting and then guide them to provide repository-related details.
-    - If the user asks a question unrelated to GitHub repositories, respond to the question appropriately while gently steering the conversation back to repositories.'''
+    Key rules:
+        - If the user's query clearly demands a search (e.g., includes phrases like "find projects," "search for," or "recommend repositories"), assume sufficient detail and proceed with the search.
+        - If details are insufficient but the intent to search is clear, proceed with the search while encouraging the user to refine their request.
+        - Always generate responses that feel natural and are tailored to the user's input.'''
 
 
     if history:
