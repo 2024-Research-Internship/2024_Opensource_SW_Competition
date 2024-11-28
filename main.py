@@ -30,27 +30,23 @@ def main():
     if "search_executed" not in st.session_state:
         st.session_state.search_executed = False  
 
-    if not st.session_state.search_executed:
-        st.header("🔥 Repositories Which You May Like")
-        default_keywords = ["Information retrieval"]  # 초기 화면에 띄울 리포지토리 키워드
-
+    if "popular_repos" not in st.session_state:
+        # 초기 리포지토리 검색 결과를 세션 상태에 저장
+        default_keywords = ["Information retrieval"]
         try:
-            popular_repos = retrieve_from_github(default_keywords)
-
-            if popular_repos:
-                for i, repo in enumerate(popular_repos[:2], 1):
-                    st.markdown(f"**{i}. [{repo['full_name']}]({repo['html_url']})**")
-                    st.write(f"   - 📝 **Description:** {repo['description']}")
-                    st.write(f"   - ⭐ **Stars:** {repo['stargazers_count']}")
-                    st.write(f"   - 🍴 **Forks:** {repo['forks_count']}")
-                    st.write(f"   - 📅 **Last Updated:** {repo['updated_at']}")
-                    readme_preview = repo['readme'][:300] if 'readme' in repo else "README not available."
-                    st.markdown(f"   - 📖 **README Preview:**\n\n```markdown\n{readme_preview}\n```")
-                    st.markdown("---")
-            else:
-                st.warning("Not found.")
+            st.session_state.popular_repos = retrieve_from_github(default_keywords)[:6]
         except Exception as e:
-            st.error(f"Error: {e}")
+            st.session_state.popular_repos = []
+            st.error(f"Error fetching repositories: {e}")
+
+    if st.session_state.popular_repos:
+        st.header("🔥 Repositories You May Like")
+        cols = st.columns(3)  # 가로로 3개의 카드로 표시
+        for i, repo in enumerate(st.session_state.popular_repos):
+            with cols[i % 3]:  # 열을 순환하며 배치
+                st.markdown(f"**[{repo['full_name']}]({repo['html_url']})** - ⭐ {repo['stargazers_count']} | 🍴 {repo['forks_count']}")
+    else:
+        st.warning("⚠️ No repositories found.")
 
     # 대화 내역 초기화
     if "conversation_history" not in st.session_state:
@@ -98,24 +94,20 @@ def main():
                 st.info("🔧 Reranking repositories based on relevance...")
                 ranked_results = rerank_by_readme(intent['rerank_keywords'], search_results)
 
-                # 상위 5개 리포지토리 표시
+                # 상위 5개 리포지토리 가로로 표시
                 st.write("### 🏆 Top 5 Recommended Repositories")
-                for i, repo in enumerate(ranked_results[:5], 1):
-                    st.markdown(f"**{i}. [{repo['full_name']}]({repo['html_url']})**")
-                    st.write(f"   - 📝 **Description:** {repo['description']}")
-                    st.write(f"   - ⭐ **Stars:** {repo['stargazers_count']}")
-                    st.write(f"   - 🍴 **Forks:** {repo['forks_count']}")
-                    st.write(f"   - 📅 **Last Updated:** {repo['updated_at']}")
-
-                    # 추천 이유 생성
-                    keywords = intent['rerank_keywords']
-                    recommended_reason = f"This repository is recommended because its description and README content align with keywords like: **{keywords}**."
-                    st.markdown(f"   - 🤖 **Why Recommended:** {recommended_reason}")
-
-                    readme_preview = repo['readme'][:300] if 'readme' in repo else "README not available."
-                    st.markdown(f"   - 📖 **README Preview:**\n\n```markdown\n{readme_preview}\n```")
-                    st.markdown(f"[🔗 Read the full README on GitHub]({repo['html_url']}/blob/main/README.md)")
-                    st.markdown("---")
+                cols = st.columns(3)  # 가로 3개의 카드
+                for i, repo in enumerate(ranked_results[:5]):
+                    with cols[i % 3]:  # 순환하면서 배치
+                        st.markdown(f"### [{repo['full_name']}]({repo['html_url']})")
+                        st.write(f"**Description:** {repo['description'] or 'No description provided.'}")
+                        st.write(f"**Stars:** {repo['stargazers_count']} ⭐")
+                        st.write(f"**Forks:** {repo['forks_count']} 🍴")
+                        st.write(f"**Last Updated:** {repo['updated_at']}")
+                        readme_preview = repo.get('readme', 'README not available.')[:150]
+                        st.markdown(f"**README Preview:**\n\n```markdown\n{readme_preview}...\n```")
+                        st.markdown(f"[🔗 View on GitHub]({repo['html_url']})")
+                        st.markdown("---")
             else:
                 st.warning("⚠️ No repositories found. Try refining your query.")
 
